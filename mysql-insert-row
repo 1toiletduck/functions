@@ -1,0 +1,51 @@
+<?php
+
+function insertData($columns, $data, $whereCondition) {
+    // Load database connection parameters from globals
+    global $db_servername, $db_username, $db_password, $db_name;
+
+    // Create a connection to the database
+    $conn = new mysqli($db_servername, $db_username, $db_password, $db_name);
+
+    // Check the connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Construct placeholders for prepared statement
+    $placeholders = implode(", ", array_fill(0, count($columns), "?"));
+
+    // SQL statement with placeholders for prepared statement
+    $sql = "INSERT INTO your_table_name (" . implode(", ", $columns) . ") VALUES ($placeholders) WHERE $whereCondition";
+
+    // Prepare the SQL statement
+    $stmt = $conn->prepare($sql);
+
+    // Combine column types into a string for bind_param
+    $types = str_repeat('s', count($data));
+
+    // Bind parameters to the prepared statement
+    $stmt->bind_param($types, ...$data);
+
+    // Execute the prepared statement
+    $stmt->execute();
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
+
+// Example usage with a WHERE clause
+$columns = ["name", "email", "age"];
+$data = ["John Doe", "john@example.com", 25];
+$whereCondition = "id = 1"; // Replace with your actual WHERE condition
+
+// Set global variables for database connection
+$GLOBALS['db_servername'] = "your_server_name";
+$GLOBALS['db_username'] = "your_username";
+$GLOBALS['db_password'] = "your_password";
+$GLOBALS['db_name'] = "your_database_name";
+
+insertData($columns, $data, $whereCondition);
+
+?>
