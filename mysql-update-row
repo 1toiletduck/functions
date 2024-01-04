@@ -1,0 +1,55 @@
+<?php
+
+function updateData($columns, $data, $whereCondition) {
+    // Load database connection parameters from globals
+    global $db_servername, $db_username, $db_password, $db_name;
+
+    // Create a connection to the database
+    $conn = new mysqli($db_servername, $db_username, $db_password, $db_name);
+
+    // Check the connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Construct SET clause for updating
+    $setClause = "";
+    foreach ($columns as $column) {
+        $setClause .= "$column = ?, ";
+    }
+    $setClause = rtrim($setClause, ", "); // Remove the trailing comma
+
+    // SQL statement with placeholders for prepared statement
+    $sql = "UPDATE your_table_name SET $setClause WHERE $whereCondition";
+
+    // Prepare the SQL statement
+    $stmt = $conn->prepare($sql);
+
+    // Combine column types into a string for bind_param
+    $types = str_repeat('s', count($data));
+
+    // Bind parameters to the prepared statement
+    $stmt->bind_param($types, ...$data);
+
+    // Execute the prepared statement
+    $stmt->execute();
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
+
+// Example usage for updating a row
+$columnsToUpdate = ["name", "email", "age"];
+$newData = ["Updated Name", "updated@example.com", 30];
+$whereCondition = "id = 1"; // Replace with your actual WHERE condition
+
+// Set global variables for database connection
+$GLOBALS['db_servername'] = "your_server_name";
+$GLOBALS['db_username'] = "your_username";
+$GLOBALS['db_password'] = "your_password";
+$GLOBALS['db_name'] = "your_database_name";
+
+updateData($columnsToUpdate, $newData, $whereCondition);
+
+?>
