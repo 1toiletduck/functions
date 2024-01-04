@@ -1,0 +1,57 @@
+<?php
+
+function fetchData($columnName, $whereColumn, $whereValue) {
+    // Load database connection parameters from globals
+    global $db_servername, $db_username, $db_password, $db_name;
+
+    // Create a connection to the database
+    $conn = new mysqli($db_servername, $db_username, $db_password, $db_name);
+
+    // Check the connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // SQL statement with placeholders for prepared statement
+    $sql = "SELECT $columnName FROM your_table_name WHERE $whereColumn = ?";
+
+    // Prepare the SQL statement
+    $stmt = $conn->prepare($sql);
+
+    // Bind parameter to the prepared statement
+    $stmt->bind_param("s", $whereValue);
+
+    // Execute the prepared statement
+    $stmt->execute();
+
+    // Bind result variables
+    $stmt->bind_result($result);
+
+    // Fetch the result
+    $stmt->fetch();
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+
+    // Return the fetched result
+    return $result;
+}
+
+// Example usage for fetching data with a WHERE clause
+$columnName = "email"; // Replace with your actual column name
+$whereColumn = "id"; // Replace with your actual WHERE column name
+$whereValue = 1; // Replace with your actual WHERE value
+
+// Set global variables for database connection
+$GLOBALS['db_servername'] = "your_server_name";
+$GLOBALS['db_username'] = "your_username";
+$GLOBALS['db_password'] = "your_password";
+$GLOBALS['db_name'] = "your_database_name";
+
+$result = fetchData($columnName, $whereColumn, $whereValue);
+
+// Process or display the result as needed
+echo $result;
+
+?>
