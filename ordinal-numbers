@@ -1,0 +1,15 @@
+function getOrdinal($number) {
+    $suffix = ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'];
+
+    if (($number % 100) >= 11 && ($number % 100) <= 13) {
+        $ordinal = $number . 'th';
+    } else {
+        $ordinal = $number . $suffix[$number % 10];
+    }
+
+    return $ordinal;
+}
+
+// Example usage:
+$number = 23;
+echo getOrdinal($number);  // Outputs: 23rd
